@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Button?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
+  minHeight="-Infinity"
+  minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
+  fx:controller="application.controller.HomeController" fx:id="home">
+  <BorderPane prefHeight="640.0" prefWidth="590.0">
+    <!--      <bottom>-->
+    <!--        <Text BorderPane.alignment="CENTER" strokeType="OUTSIDE" strokeWidth="0.0"-->
+    <!--          text="this system is created by NikolaZhang!"/>-->
+    <!--      </bottom>-->
+    <!--      <center>-->
+    <!--        <ScrollPane BorderPane.alignment="CENTER" prefHeight="600.0">-->
+    <!--          <content>-->
+    <!--            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="593.0"-->
+    <!--              prefWidth="480.0" fx:id="main_pane_under_scroll"/>-->
+    <!--          </content>-->
+    <!--        </ScrollPane>-->
+    <!--      </center>-->
+    <!--      <left>-->
+    <!--        <TreeView BorderPane.alignment="TOP_LEFT" onMouseClicked="#mainTreeViewClick"-->
+    <!--          prefHeight="360.0"-->
+    <!--          prefWidth="126.0" fx:id="main_treeview"/>-->
+    <!--      </left>-->
+    <top>
+      <Text BorderPane.alignment="CENTER" strokeType="OUTSIDE" strokeWidth="2.0" text="null" fx:id="info"/>
+    </top>
+  </BorderPane>
+  <Button layoutX="240.0" layoutY="120.0" mnemonicParsing="false" onAction="#startButtonClick"
+    text="Start Game" fx:id="startButton"/>
+  <Button layoutX="240.0" layoutY="160.0" mnemonicParsing="false" onAction="#settingButtonClick"
+    text="Setting" fx:id="settingButton"/>
+  <Button layoutX="240.0" layoutY="200.0" mnemonicParsing="false" onAction="#logoutButtonClick"
+    text="Logout" fx:id="logoutButton"/>
+  <Button layoutX="240.0" layoutY="240.0" mnemonicParsing="false" onAction="#quitButtonClick"
+    text="Quit" fx:id="quitButton"/>
+</AnchorPane>
