@@ -106,7 +106,7 @@ public class GameController implements Initializable {
   public void setApp(Client client) {
     this.client = client;
   }
-  
+
   public void backButtonClick() {
     client.enterHome();
   }

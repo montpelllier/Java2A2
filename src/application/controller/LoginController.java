@@ -39,9 +39,9 @@ public class LoginController implements Initializable {
     //TODO: connect with server
 //    if ("admin".equalsIgnoreCase(loginUsername.getText())
 //        && "123456".equalsIgnoreCase(loginPassword.getText())) {
-      logger.log(Level.INFO, "登录成功！");
-      client.userName = loginUsername.getText();
-      client.enterHome();
+    logger.log(Level.INFO, "登录成功！");
+    client.userName = loginUsername.getText();
+    client.enterHome();
 //    } else {
 //
 //      logger.log(Level.WARNING, "用户名或密码错误！");
@@ -49,7 +49,7 @@ public class LoginController implements Initializable {
   }
 
   public void registerButtonClick() {
-   client.enterRegister();
+    client.enterRegister();
   }
 
   @Override

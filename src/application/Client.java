@@ -1,10 +1,14 @@
 package application;
 
+import application.controller.GameController;
 import application.controller.HomeController;
 import application.controller.LoginController;
-import application.controller.GameController;
 import application.controller.RegisterController;
 import application.resource.StaticResourcesConfig;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -15,13 +19,15 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+
 public class Client extends Application {
 
   private static final Logger logger = Logger.getLogger(Client.class.getName());
-  private Stage stage;
   public String userName;
   public int gross = -1;
   public int win = -1;
+  private Stage stage;
+  private Socket socket;
 
   public Client() {
   }
@@ -37,6 +43,16 @@ public class Client extends Application {
     enterLogin();
     stage.show();
     stage.setResizable(false);
+    try {
+      socket = new Socket("localhost", 8888);
+      DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+      DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+      outputStream.writeUTF("I am client!");
+      System.out.println(inputStream.read());
+    } catch (IOException e) {
+      logger.log(Level.WARNING, e.toString());
+    }
+
   }
 
   /**
@@ -77,7 +93,8 @@ public class Client extends Application {
 
   public void enterGamePage() {
     try {
-      GameController gameController = (GameController) replaceSceneContent(StaticResourcesConfig.GAME_VIEW_FXML);
+      GameController gameController = (GameController) replaceSceneContent(
+          StaticResourcesConfig.GAME_VIEW_FXML);
       gameController.setApp(this);
     } catch (Exception e) {
       logger.log(Level.SEVERE, null, e);
@@ -98,12 +115,13 @@ public class Client extends Application {
     loader.setLocation(getClass().getClassLoader().getResource(fxml));
     try {
 //      AnchorPane page = (AnchorPane) loader.load(in);
+
       Pane page = loader.load();
       Scene scene = new Scene(page);
       stage.setScene(scene);
       stage.sizeToScene();
     } catch (Exception e) {
-      logger.log(Level.SEVERE, "页面加载异常！"+e);
+      logger.log(Level.SEVERE, "页面加载异常！" + e);
     }
 
     return loader.getController();
