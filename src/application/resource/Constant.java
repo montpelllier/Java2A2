@@ -1,6 +1,6 @@
 package application.resource;
 
-public final class StaticResourcesConfig {
+public final class Constant {
 
   public final static int STAGE_WIDTH = 800;
   public final static int STAGE_HEIGHT = 600;
@@ -16,15 +16,6 @@ public final class StaticResourcesConfig {
 //  public static final String DATA_VIEW_PATH = "/app/view/panel/datanaly/DataView.fxml";
 //  public static final String USER_VIEW_PATH = "/app/view/panel/usermanage/UserView.fxml";
 
-  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-  // WWW   界面字段显示 				    WWW
-  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-  public final static String MAIN_TREE_HEADER = "首页";
-  public final static String MAIN_TREE_HEADER_ITEM1 = "记事本";
-  public final static String MAIN_TREE_HEADER_ITEM2 = "剪贴板";
-  public final static String MAIN_TREE_HEADER_ITEM3 = "用户管理";
-  public final static String MAIN_TREE_HEADER_ITEM4 = "数据分析";
-  public final static String MAIN_TREE_HEADER_ITEM5 = "语言";
 
 
 }

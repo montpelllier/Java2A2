@@ -3,6 +3,8 @@ package application.controller;
 import application.Client;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import application.resource.Constant;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -19,11 +21,11 @@ public class RegisterController implements Initializable {
 
   public void conformButtonClick() {
     //TODO
-    client.enterHome();
+    client.enterView( Constant.HOME_VIEW_FXML);
   }
 
   public void backButtonClick(ActionEvent actionEvent) {
-    client.enterLogin();
+    client.enterView(Constant.LOGIN_VIEW_FXML);
   }
 
   @Override

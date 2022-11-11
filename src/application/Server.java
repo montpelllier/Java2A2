@@ -1,5 +1,6 @@
 package application;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,26 +11,23 @@ import java.util.logging.Logger;
 public class Server {
 
   private static final Logger logger = Logger.getLogger(Client.class.getName());
-  private static final int port = 8888;
 
-  public static void main(String[] args) {
-    try {
-      ServerSocket serverSocket = new ServerSocket(port);
-      while (true) {
-        Socket socket = serverSocket.accept();
-        InetAddress address = socket.getInetAddress();
-        logger.log(Level.SEVERE,
-            "Start a new thread for client at " + new Date() + "\naddress is: " + address);
+  public static void main(String[] args) throws IOException {
 
-        new Thread(new GameHandler(socket));
-        Thread.sleep(100);
-      }
+    final int SBAP_PORT = 8888;
+    ServerSocket server = new ServerSocket(SBAP_PORT);
 
-    } catch (Exception e) {
-      logger.log(Level.WARNING, e.toString());
+    System.out.println("Waiting for clients to connect...");
+    while (true) {
+      Socket clientSocket1 = server.accept();
+      System.out.println("player1 connected.");
+      Socket clientSocket2 = server.accept();
+      System.out.println("player2 connected.");
 
+      GameService service = new GameService(clientSocket1, clientSocket2);
+      Thread thread = new Thread(service);
+      thread.start();
     }
-
   }
 
 }

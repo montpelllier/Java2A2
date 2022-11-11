@@ -3,6 +3,8 @@ package application.controller;
 import application.Client;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import application.resource.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -22,6 +24,9 @@ public class GameController implements Initializable {
   private static final int[][] chessBoard = new int[3][3];
   private static final boolean[][] flag = new boolean[3][3];
   private static boolean TURN = false;
+
+  private boolean isMyTurn;
+
   public Button backButton;
   @FXML
   private Pane base_square;
@@ -31,17 +36,19 @@ public class GameController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    isMyTurn = client.hand == 1;
     game_panel.setOnMouseClicked(event -> {
       int x = (int) (event.getX() / BOUND);
       int y = (int) (event.getY() / BOUND);
       if (refreshBoard(x, y)) {
         TURN = !TURN;
+        isMyTurn = !isMyTurn;
       }
     });
   }
 
   private boolean refreshBoard(int x, int y) {
-    if (chessBoard[x][y] == EMPTY) {
+    if (chessBoard[x][y] == EMPTY && isMyTurn) {
       chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
       drawChess();
       return true;
@@ -108,6 +115,6 @@ public class GameController implements Initializable {
   }
 
   public void backButtonClick() {
-    client.enterHome();
+    client.enterView(Constant.HOME_VIEW_FXML);
   }
 }

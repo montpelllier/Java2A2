@@ -4,6 +4,8 @@ import application.Client;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+
+import application.resource.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -57,7 +59,7 @@ public class HomeController implements Initializable {
   }
 
   public void logoutButtonClick() {
-    client.enterLogin();
+    client.enterView(Constant.LOGIN_VIEW_FXML);
   }
 
   public void quitButtonClick() {

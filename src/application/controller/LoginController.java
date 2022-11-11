@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import application.resource.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -41,7 +43,7 @@ public class LoginController implements Initializable {
 //        && "123456".equalsIgnoreCase(loginPassword.getText())) {
     logger.log(Level.INFO, "登录成功！");
     client.userName = loginUsername.getText();
-    client.enterHome();
+    client.enterView( Constant.HOME_VIEW_FXML);
 //    } else {
 //
 //      logger.log(Level.WARNING, "用户名或密码错误！");
@@ -49,7 +51,7 @@ public class LoginController implements Initializable {
   }
 
   public void registerButtonClick() {
-    client.enterRegister();
+    client.enterView(Constant.REGISTER_VIEW_FXML);
   }
 
   @Override
