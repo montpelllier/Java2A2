@@ -9,7 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 
-public class RegisterController implements Initializable {
+public class RegisterController implements Initializable, Controller {
 
   public Button conformButton;
   public Button backButton;

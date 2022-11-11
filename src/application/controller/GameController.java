@@ -14,7 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
-public class GameController implements Initializable {
+public class GameController implements Initializable, Controller {
 
   private static final int PLAY_1 = 1;
   private static final int PLAY_2 = 2;
@@ -25,7 +25,7 @@ public class GameController implements Initializable {
   private static final boolean[][] flag = new boolean[3][3];
   private static boolean TURN = false;
 
-  private boolean isMyTurn;
+  private static boolean isMyTurn = false;
 
   public Button backButton;
   @FXML
@@ -36,7 +36,7 @@ public class GameController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    isMyTurn = client.hand == 1;
+
     game_panel.setOnMouseClicked(event -> {
       int x = (int) (event.getX() / BOUND);
       int y = (int) (event.getY() / BOUND);
@@ -112,6 +112,7 @@ public class GameController implements Initializable {
 
   public void setApp(Client client) {
     this.client = client;
+    isMyTurn = client.hand == 1;
   }
 
   public void backButtonClick() {

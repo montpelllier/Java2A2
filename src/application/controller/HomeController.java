@@ -15,7 +15,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
 
-public class HomeController implements Initializable {
+public class HomeController implements Initializable, Controller {
 
   private static final Logger logger = Logger.getLogger(HomeController.class.getName());
   public AnchorPane home;
@@ -50,8 +50,7 @@ public class HomeController implements Initializable {
   }
 
   public void startButtonClick() {
-    //
-    client.enterGamePage();
+    client.enterView(Constant.GAME_VIEW_FXML);
   }
 
   public void settingButtonClick() {

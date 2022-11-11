@@ -16,7 +16,7 @@ import javafx.scene.layout.AnchorPane;
 /**
  * Javadoc.
  */
-public class LoginController implements Initializable {
+public class LoginController implements Initializable, Controller {
 
   private static final Logger logger = Logger.getLogger(LoginController.class.getName());
   public AnchorPane login;
