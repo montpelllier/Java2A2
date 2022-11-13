@@ -1,7 +1,6 @@
 package application;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -14,19 +13,18 @@ public class Server {
 
   public static void main(String[] args) throws IOException {
 
-    final int SBAP_PORT = 8888;
-    ServerSocket server = new ServerSocket(SBAP_PORT);
+    final int GAME_PORT = 8888;
+    ServerSocket server = new ServerSocket(GAME_PORT);
+    GameService service = new GameService();
+    Thread thread = new Thread(service);
+    thread.start();
 
     System.out.println("Waiting for clients to connect...");
     while (true) {
-      Socket clientSocket1 = server.accept();
-      System.out.println("player1 connected.");
-      Socket clientSocket2 = server.accept();
-      System.out.println("player2 connected.");
+      Socket clientSocket = server.accept();
+      System.out.printf("player %s connected.", clientSocket.getPort());
+      service.addPlayer(clientSocket);
 
-      GameService service = new GameService(clientSocket1, clientSocket2);
-      Thread thread = new Thread(service);
-      thread.start();
     }
   }
 

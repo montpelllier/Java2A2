@@ -24,7 +24,6 @@ public class GameController implements Initializable, Controller {
   private static final int[][] chessBoard = new int[3][3];
   private static final boolean[][] flag = new boolean[3][3];
   private static boolean TURN = false;
-
   private static boolean isMyTurn = false;
 
   public Button backButton;
@@ -41,10 +40,17 @@ public class GameController implements Initializable, Controller {
       int x = (int) (event.getX() / BOUND);
       int y = (int) (event.getY() / BOUND);
       if (refreshBoard(x, y)) {
-        TURN = !TURN;
-        isMyTurn = !isMyTurn;
+//        TURN = !TURN;
+//        isMyTurn = !isMyTurn;
+//        update();
+        client.sendCmd(String.format("move                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         :%d,%d", x, y));
+
       }
     });
+  }
+
+  private void update() {
+
   }
 
   private boolean refreshBoard(int x, int y) {
@@ -117,5 +123,9 @@ public class GameController implements Initializable, Controller {
 
   public void backButtonClick() {
     client.enterView(Constant.HOME_VIEW_FXML);
+  }
+
+  public static void setOppPos(int x, int y) {
+
   }
 }

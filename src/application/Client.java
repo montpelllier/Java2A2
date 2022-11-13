@@ -55,14 +55,8 @@ public class Client extends Application {
             in = new Scanner(inputStream);
             out = new PrintWriter(outputStream);
 
-//      String cmd = "test";
-//      System.out.println(cmd);
-//      out.println("send: "+cmd);
-//      out.flush();
-//
-//      String response = in.nextLine();
-//      System.out.println("get: "+response);
-
+            Thread thread = new Thread(this::connect);
+            thread.start();
 
         } catch (IOException e) {
             logger.log(Level.WARNING, e.toString());
@@ -93,11 +87,10 @@ public class Client extends Application {
      */
     private Initializable replaceSceneContent(String fxml) throws Exception {
         FXMLLoader loader = new FXMLLoader();
-//    InputStream in = Client.class.getResourceAsStream(fxml);
         loader.setBuilderFactory(new JavaFXBuilderFactory());
         loader.setLocation(getClass().getClassLoader().getResource(fxml));
+
         try {
-//      AnchorPane page = (AnchorPane) loader.load(in);
 
             Pane page = loader.load();
             Scene scene = new Scene(page);
@@ -110,6 +103,31 @@ public class Client extends Application {
         return loader.getController();
     }
 
+    public void connect() {
+        while (true) {
+            if (!in.hasNext()) {
+                return;
+            }
+            String receive = in.next();
+            System.out.println(receive);
+
+            if (receive.equals("waiting")) {
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //todo: waiting window
+            } else if (receive.startsWith("game start:")) {
+                hand = Character.getNumericValue(receive.charAt(11));
+            } else if (receive.startsWith("oppo:")) {
+                String pos = receive.substring(5);
+
+            }
+
+        }
+    }
+
     public void close() {
         try {
             sendCmd("quit");
@@ -118,6 +136,5 @@ public class Client extends Application {
         } finally {
             this.stage.close();
         }
-
     }
 }
