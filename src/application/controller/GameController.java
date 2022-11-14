@@ -4,7 +4,7 @@ import application.Client;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import application.resource.Constant;
+import application.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -24,7 +24,6 @@ public class GameController implements Initializable, Controller {
   private static final int[][] chessBoard = new int[3][3];
   private static final boolean[][] flag = new boolean[3][3];
   private static boolean TURN = false;
-  private static boolean isMyTurn = false;
 
   public Button backButton;
   @FXML
@@ -43,8 +42,8 @@ public class GameController implements Initializable, Controller {
 //        TURN = !TURN;
 //        isMyTurn = !isMyTurn;
 //        update();
-        client.sendCmd(String.format("move                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         :%d,%d", x, y));
-
+        client.sendCmd(String.format("move:%d,%d", x, y));
+        client.isMyTurn = false;
       }
     });
   }
@@ -54,7 +53,7 @@ public class GameController implements Initializable, Controller {
   }
 
   private boolean refreshBoard(int x, int y) {
-    if (chessBoard[x][y] == EMPTY && isMyTurn) {
+    if (chessBoard[x][y] == EMPTY && client.isMyTurn) {
       chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
       drawChess();
       return true;
@@ -118,7 +117,6 @@ public class GameController implements Initializable, Controller {
 
   public void setApp(Client client) {
     this.client = client;
-    isMyTurn = client.hand == 1;
   }
 
   public void backButtonClick() {

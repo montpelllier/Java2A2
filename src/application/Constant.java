@@ -1,7 +1,8 @@
-package application.resource;
+package application;
 
 public final class Constant {
 
+  public final static int PORT = 8888;
   public final static int STAGE_WIDTH = 800;
   public final static int STAGE_HEIGHT = 600;
 

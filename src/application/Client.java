@@ -1,7 +1,6 @@
 package application;
 
 import application.controller.Controller;
-import application.resource.Constant;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -27,6 +26,7 @@ public class Client extends Application {
     public int win;
     //first = 1, second = 2
     public int hand;
+    public boolean isMyTurn = false;
     private Stage stage;
     private Socket socket;
     private Scanner in;
@@ -49,7 +49,7 @@ public class Client extends Application {
 
 
         try {
-            socket = new Socket("localhost", 8888);
+            socket = new Socket("localhost", Constant.PORT);
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             in = new Scanner(inputStream);
@@ -83,9 +83,8 @@ public class Client extends Application {
      *
      * @param fxml
      * @return
-     * @throws Exception
      */
-    private Initializable replaceSceneContent(String fxml) throws Exception {
+    private Initializable replaceSceneContent(String fxml) {
         FXMLLoader loader = new FXMLLoader();
         loader.setBuilderFactory(new JavaFXBuilderFactory());
         loader.setLocation(getClass().getClassLoader().getResource(fxml));
@@ -108,8 +107,8 @@ public class Client extends Application {
             if (!in.hasNext()) {
                 return;
             }
-            String receive = in.next();
-            System.out.println(receive);
+            String receive = in.nextLine();
+            System.out.println("from server: "+receive);
 
             if (receive.equals("waiting")) {
                 try {
@@ -120,6 +119,8 @@ public class Client extends Application {
                 //todo: waiting window
             } else if (receive.startsWith("game start:")) {
                 hand = Character.getNumericValue(receive.charAt(11));
+                isMyTurn = hand == 1;
+                System.out.println(hand);
             } else if (receive.startsWith("oppo:")) {
                 String pos = receive.substring(5);
 

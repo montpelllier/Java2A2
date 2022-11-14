@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import application.resource.Constant;
+import application.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -50,6 +50,7 @@ public class HomeController implements Initializable, Controller {
   }
 
   public void startButtonClick() {
+    client.sendCmd("start");
     client.enterView(Constant.GAME_VIEW_FXML);
   }
 

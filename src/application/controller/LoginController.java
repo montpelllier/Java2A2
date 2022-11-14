@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import application.resource.Constant;
+import application.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -36,12 +36,15 @@ public class LoginController implements Initializable, Controller {
    * Javadoc.
    */
   public void loginButtonClick() {
-    logger.log(Level.INFO, "输入用户名为：" + loginUsername.getText());
-    logger.log(Level.INFO, "输入密码为：" + loginPassword.getText());
+    String account = loginUsername.getText();
+    String psw = loginPassword.getText();
+    logger.log(Level.INFO, "输入用户名为：" + account);
+    logger.log(Level.INFO, "输入密码为：" + psw);
     //TODO: connect with server
+    client.sendCmd(String.format("login:%s,%s", account, psw));
 //    if ("admin".equalsIgnoreCase(loginUsername.getText())
 //        && "123456".equalsIgnoreCase(loginPassword.getText())) {
-    logger.log(Level.INFO, "登录成功！");
+//    logger.log(Level.INFO, "登录成功！");
     client.userName = loginUsername.getText();
     client.enterView( Constant.HOME_VIEW_FXML);
 //    } else {

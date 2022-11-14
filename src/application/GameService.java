@@ -16,7 +16,6 @@ public class GameService implements Runnable{
     Socket player2;
     private static final int EMPTY = 0;
     private static int[][] chessBoard;
-    private static boolean[][] flag;
     private static boolean TURN = false;
 
     Socket waiting = null;
@@ -55,8 +54,8 @@ public class GameService implements Runnable{
             if (!in.hasNext()) {
                 return;
             }
-            String cmd = in.next();
-            System.out.println(cmd);
+            String cmd = in.nextLine();
+            System.out.printf("from player %d: %s\n", player.getPort(), cmd);
 
             if (cmd.equals("start")) {
                 if (startNewGame(player)) {
@@ -65,12 +64,29 @@ public class GameService implements Runnable{
                     send("wait", out);
                 }
             } else if (cmd.equals("quit")) {
+                if (waiting == player) waiting = null;
                 return;
             } else if (cmd.startsWith("move:")) {
-                String pos = cmd.substring(5);
+                String[] pos = cmd.substring(5).split(",");
+                int x = Integer.getInteger(pos[0]);
+                int y = Integer.getInteger(pos[1]);
+                if (player == player1 && chessBoard[x][y] == EMPTY) {
+                    chessBoard[x][y] = 1;
+                    send(String.format("oppo:%d,%d", x, y), player2);
+                } else if (player == player2 && chessBoard[x][y] == EMPTY) {
+                    chessBoard[x][y] = 2;
+                    send(String.format("oppo:%d,%d", x, y), player1);
+                } else {
+                    send("illegal position", player);
+                }
+            } else if (cmd.startsWith("login:")) {
+                String[] logInfo = cmd.substring(6).split(",");
+//                String accout = logInfo[0];
+//                String psw = logInfo[1];
+            } else {
+                System.out.println("unknown command");
             }
 
-//            send(cmd, out);
         }
     }
 
@@ -79,17 +95,28 @@ public class GameService implements Runnable{
         printWriter.flush();
     }
 
-    public synchronized boolean startNewGame(Socket player) throws IOException {
+    public void send(String msg, Socket socket) {
+        try {
+            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            out.println(msg);
+            out.println();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public synchronized boolean startNewGame(Socket player) {
         if (waiting == null) {
             waiting = player;
             return false;
         } else {
             chessBoard = new int[3][3];
-            flag = new boolean[3][3];
             player1 = waiting;
             player2 = player;
 
-            send("start game: 1", new PrintWriter(waiting.getOutputStream()));
+            send("game start:1", waiting);
 
             waiting = null;
             return true;

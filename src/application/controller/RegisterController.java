@@ -4,7 +4,7 @@ import application.Client;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import application.resource.Constant;
+import application.Constant;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
