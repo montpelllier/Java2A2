@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import application.Constant;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,15 +16,9 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 public class GameController implements Initializable, Controller {
-
-  private static final int PLAY_1 = 1;
-  private static final int PLAY_2 = 2;
   private static final int EMPTY = 0;
   private static final int BOUND = 90;
   private static final int OFFSET = 15;
-  private static final int[][] chessBoard = new int[3][3];
-  private static final boolean[][] flag = new boolean[3][3];
-  private static boolean TURN = false;
 
   public Button backButton;
   @FXML
@@ -34,45 +29,33 @@ public class GameController implements Initializable, Controller {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-
     game_panel.setOnMouseClicked(event -> {
       int x = (int) (event.getX() / BOUND);
       int y = (int) (event.getY() / BOUND);
       if (refreshBoard(x, y)) {
-//        TURN = !TURN;
-//        isMyTurn = !isMyTurn;
-//        update();
         client.sendCmd(String.format("move:%d,%d", x, y));
         client.isMyTurn = false;
       }
     });
   }
 
-  private void update() {
-
-  }
-
   private boolean refreshBoard(int x, int y) {
-    if (chessBoard[x][y] == EMPTY && client.isMyTurn) {
-      chessBoard[x][y] = TURN ? PLAY_1 : PLAY_2;
+    if (client.chessBoard[x][y] == EMPTY && client.isMyTurn) {
+      client.chessBoard[x][y] = client.hand;
       drawChess();
       return true;
     }
     return false;
   }
 
-  private void drawChess() {
-    for (int i = 0; i < chessBoard.length; i++) {
-      for (int j = 0; j < chessBoard[0].length; j++) {
-        if (flag[i][j]) {
-          // This square has been drawing, ignore.
-          continue;
-        }
-        switch (chessBoard[i][j]) {
-          case PLAY_1:
+  public void drawChess() {
+    for (int i = 0; i < client.chessBoard.length; i++) {
+      for (int j = 0; j < client.chessBoard[0].length; j++) {
+        switch (client.chessBoard[i][j]) {
+          case 1:
             drawCircle(i, j);
             break;
-          case PLAY_2:
+          case -1:
             drawLine(i, j);
             break;
           case EMPTY:
@@ -93,7 +76,7 @@ public class GameController implements Initializable, Controller {
     circle.setRadius(BOUND / 2.0 - OFFSET / 2.0);
     circle.setStroke(Color.RED);
     circle.setFill(Color.TRANSPARENT);
-    flag[i][j] = true;
+//    flag[i][j] = true;
   }
 
   private void drawLine(int i, int j) {
@@ -112,7 +95,7 @@ public class GameController implements Initializable, Controller {
     line_b.setEndX(i * BOUND + OFFSET * 1.5);
     line_b.setEndY((j + 1) * BOUND + OFFSET * 0.5);
     line_b.setStroke(Color.BLUE);
-    flag[i][j] = true;
+//    flag[i][j] = true;
   }
 
   public void setApp(Client client) {
@@ -123,7 +106,4 @@ public class GameController implements Initializable, Controller {
     client.enterView(Constant.HOME_VIEW_FXML);
   }
 
-  public static void setOppPos(int x, int y) {
-
-  }
 }

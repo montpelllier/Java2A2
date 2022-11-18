@@ -51,7 +51,7 @@ public class HomeController implements Initializable, Controller {
 
   public void startButtonClick() {
     client.sendCmd("start");
-    client.enterView(Constant.GAME_VIEW_FXML);
+//    client.enterView(Constant.GAME_VIEW_FXML);
   }
 
   public void settingButtonClick() {

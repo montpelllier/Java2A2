@@ -4,21 +4,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class GameService implements Runnable{
+public class GameService implements Runnable {
 
-    List<Socket> playerList = new ArrayList<>();
-    List<Thread> threadList = new ArrayList<>();
-
-    Socket player1;
-    Socket player2;
     private static final int EMPTY = 0;
     private static int[][] chessBoard;
-    private static boolean TURN = false;
-
+    private static final boolean TURN = false;
+    List<Socket> playerList = new ArrayList<>();
+    List<Thread> threadList = new ArrayList<>();
+    Socket player1;
+    Socket player2;
     Socket waiting = null;
+
     public void addPlayer(Socket player) {
         playerList.add(player);
         Thread thread = new Thread(() -> {
@@ -30,7 +30,6 @@ public class GameService implements Runnable{
             }
         });
         threadList.add(thread);
-
     }
 
     @Override
@@ -41,7 +40,7 @@ public class GameService implements Runnable{
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }
@@ -59,7 +58,7 @@ public class GameService implements Runnable{
 
             if (cmd.equals("start")) {
                 if (startNewGame(player)) {
-                    send("game start:2", out);
+                    send("game start:-1", out);
                 } else {
                     send("wait", out);
                 }
@@ -68,26 +67,81 @@ public class GameService implements Runnable{
                 return;
             } else if (cmd.startsWith("move:")) {
                 String[] pos = cmd.substring(5).split(",");
-                int x = Integer.getInteger(pos[0]);
-                int y = Integer.getInteger(pos[1]);
-                if (player == player1 && chessBoard[x][y] == EMPTY) {
-                    chessBoard[x][y] = 1;
-                    send(String.format("oppo:%d,%d", x, y), player2);
-                } else if (player == player2 && chessBoard[x][y] == EMPTY) {
-                    chessBoard[x][y] = 2;
-                    send(String.format("oppo:%d,%d", x, y), player1);
+                int x = Integer.parseInt(pos[0]);
+                int y = Integer.parseInt(pos[1]);
+                String backInfo = String.format("oppo:%d,%d", x, y);
+                if (player == player1 || player == player2 && chessBoard[x][y] == EMPTY) {
+                    chessBoard[x][y] = player == player1 ? 1 : -1;
+                    checkGameOver();
+                    send(backInfo, player == player2 ? player1 : player2);
                 } else {
                     send("illegal position", player);
                 }
             } else if (cmd.startsWith("login:")) {
+                //todo
                 String[] logInfo = cmd.substring(6).split(",");
-//                String accout = logInfo[0];
-//                String psw = logInfo[1];
+                String accout = logInfo[0];
+                String psw = logInfo[1];
             } else {
                 System.out.println("unknown command");
             }
 
         }
+    }
+
+    private void checkGameOver() {
+        boolean draw = true;
+        for (int i = 0; i < 3; i++) {
+            //检查行
+            int sum = Arrays.stream(chessBoard[i]).sum();
+            if (checkResult(sum)) {
+                //
+            }
+            //检查列
+            sum = 0;
+            for (int j = 0; j < 3; j++) {
+                sum += chessBoard[j][i];
+                if (chessBoard[i][j] == EMPTY) {
+                    draw = false;
+                }
+            }
+            if (checkResult(sum)) {
+                //return true;
+            }
+        }
+        //检查对角
+        for (int i = 0, sum = 0; i<3;i++) {
+            sum += chessBoard[i][i];
+            if (checkResult(sum)) {
+                //return true;
+            }
+        }
+        for (int i = 0, sum = 0; i<3;i++) {
+            sum += chessBoard[2 - i][i];
+            if (checkResult(sum)) {
+                //return true;
+            }
+        }
+        //检查平局
+        if (draw) {
+            send("result:draw", player1);
+            send("result:draw", player2);
+            //return true;
+        }
+        //return false;
+    }
+
+    private boolean checkResult(int num) {
+        if (num == 3) {
+            send("result:win", player1);
+            send("result:lose", player2);
+        } else if (num == -3) {
+            send("result:lose", player1);
+            send("result:win", player2);
+        } else {
+            return false;
+        }
+        return true;
     }
 
     public void send(String msg, PrintWriter printWriter) {
@@ -99,12 +153,10 @@ public class GameService implements Runnable{
         try {
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             out.println(msg);
-            out.println();
-        }catch (Exception e) {
+            out.flush();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     public synchronized boolean startNewGame(Socket player) {
