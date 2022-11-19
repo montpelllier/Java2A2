@@ -1,23 +1,16 @@
 package application.controller;
 
 import application.Client;
+import application.Constant;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
-
-import application.Constant;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
-
 public class HomeController implements Initializable, Controller {
 
-  private static final Logger logger = Logger.getLogger(HomeController.class.getName());
   public AnchorPane home;
   public Button startButton;
   public Button settingButton;
@@ -26,18 +19,10 @@ public class HomeController implements Initializable, Controller {
   public Text info;
   private Client client;
 
-  @FXML
-  private TreeView<String> main_treeview;
-
-  @FXML
-  private ScrollPane main_scroll_pane;
-
-  @FXML
-  private AnchorPane main_pane_under_scroll;
-
   public void setApp(Client client) {
     this.client = client;
-    info.setText(String.format("WELCOME %s\nGROSS GAME:%d; WIN:%d; TIE:%d", client.userName, client.gross, client.win, client.tie));
+    info.setText(String.format("WELCOME %s\nGROSS GAME:%d; WIN:%d; TIE:%d", client.userName,
+        client.gross, client.win, client.tie));
   }
 
   @Override
@@ -50,8 +35,6 @@ public class HomeController implements Initializable, Controller {
 
   public void startButtonClick() {
     client.sendCmd("start");
-    //TODO
-//    client.enterView(Constant.GAME_VIEW_FXML);
   }
 
   public void settingButtonClick() {

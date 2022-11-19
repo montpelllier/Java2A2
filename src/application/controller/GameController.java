@@ -1,11 +1,9 @@
 package application.controller;
 
 import application.Client;
+import application.Constant;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import application.Constant;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -16,20 +14,21 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 public class GameController implements Initializable, Controller {
+
   private static final int EMPTY = 0;
   private static final int BOUND = 90;
   private static final int OFFSET = 15;
 
   public Button backButton;
   @FXML
-  private Pane base_square;
+  private Pane baseSquare;
   @FXML
-  private Rectangle game_panel;
+  private Rectangle gamePanel;
   private Client client;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    game_panel.setOnMouseClicked(event -> {
+    gamePanel.setOnMouseClicked(event -> {
       int x = (int) (event.getX() / BOUND);
       int y = (int) (event.getY() / BOUND);
       if (refreshBoard(x, y)) {
@@ -70,32 +69,30 @@ public class GameController implements Initializable, Controller {
 
   private void drawCircle(int i, int j) {
     Circle circle = new Circle();
-    base_square.getChildren().add(circle);
+    baseSquare.getChildren().add(circle);
     circle.setCenterX(i * BOUND + BOUND / 2.0 + OFFSET);
     circle.setCenterY(j * BOUND + BOUND / 2.0 + OFFSET);
     circle.setRadius(BOUND / 2.0 - OFFSET / 2.0);
     circle.setStroke(Color.RED);
     circle.setFill(Color.TRANSPARENT);
-//    flag[i][j] = true;
   }
 
   private void drawLine(int i, int j) {
-    Line line_a = new Line();
-    Line line_b = new Line();
-    base_square.getChildren().add(line_a);
-    base_square.getChildren().add(line_b);
-    line_a.setStartX(i * BOUND + OFFSET * 1.5);
-    line_a.setStartY(j * BOUND + OFFSET * 1.5);
-    line_a.setEndX((i + 1) * BOUND + OFFSET * 0.5);
-    line_a.setEndY((j + 1) * BOUND + OFFSET * 0.5);
-    line_a.setStroke(Color.BLUE);
+    Line lineA = new Line();
+    Line lineB = new Line();
+    baseSquare.getChildren().add(lineA);
+    baseSquare.getChildren().add(lineB);
+    lineA.setStartX(i * BOUND + OFFSET * 1.5);
+    lineA.setStartY(j * BOUND + OFFSET * 1.5);
+    lineA.setEndX((i + 1) * BOUND + OFFSET * 0.5);
+    lineA.setEndY((j + 1) * BOUND + OFFSET * 0.5);
+    lineA.setStroke(Color.BLUE);
 
-    line_b.setStartX((i + 1) * BOUND + OFFSET * 0.5);
-    line_b.setStartY(j * BOUND + OFFSET * 1.5);
-    line_b.setEndX(i * BOUND + OFFSET * 1.5);
-    line_b.setEndY((j + 1) * BOUND + OFFSET * 0.5);
-    line_b.setStroke(Color.BLUE);
-//    flag[i][j] = true;
+    lineB.setStartX((i + 1) * BOUND + OFFSET * 0.5);
+    lineB.setStartY(j * BOUND + OFFSET * 1.5);
+    lineB.setEndX(i * BOUND + OFFSET * 1.5);
+    lineB.setEndY((j + 1) * BOUND + OFFSET * 0.5);
+    lineB.setStroke(Color.BLUE);
   }
 
   public void setApp(Client client) {

@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import application.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -24,18 +22,12 @@ public class LoginController implements Initializable, Controller {
   public Button registerButton;
   @FXML
   private Button loginButton;
-
   @FXML
   private TextField loginUsername;
-
   @FXML
   private TextField loginPassword;
-
   private Client client;
 
-  /**
-   * Javadoc.
-   */
   public void loginButtonClick() {
     String account = loginUsername.getText();
     String psw = loginPassword.getText();
@@ -49,22 +41,12 @@ public class LoginController implements Initializable, Controller {
     } else {
       client.sendCmd(String.format("login:%s,%s", account, psw));
     }
-
-//    if ("admin".equalsIgnoreCase(loginUsername.getText())
-//        && "123456".equalsIgnoreCase(loginPassword.getText())) {
-//    logger.log(Level.INFO, "登录成功！");
-//    client.userName = loginUsername.getText();
-//    client.enterView( Constant.HOME_VIEW_FXML);
-//    } else {
-//
-//      logger.log(Level.WARNING, "用户名或密码错误！");
-//    }
   }
 
   public void registerButtonClick() {
     String account = loginUsername.getText();
     String psw = loginPassword.getText();
-    client.sendCmd(String.format("reg:%s,%s",account, psw));
+    client.sendCmd(String.format("reg:%s,%s", account, psw));
   }
 
   @Override
