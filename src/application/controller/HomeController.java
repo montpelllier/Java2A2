@@ -37,12 +37,11 @@ public class HomeController implements Initializable, Controller {
 
   public void setApp(Client client) {
     this.client = client;
-    info.setText("WELCOME " + client.userName);
+    info.setText(String.format("WELCOME %s\nGROSS GAME:%d; WIN:%d; TIE:%d", client.userName, client.gross, client.win, client.tie));
   }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-//    setTreeView();
     startButton.setPrefWidth(120);
     settingButton.setPrefWidth(120);
     logoutButton.setPrefWidth(120);
@@ -51,6 +50,7 @@ public class HomeController implements Initializable, Controller {
 
   public void startButtonClick() {
     client.sendCmd("start");
+    //TODO
 //    client.enterView(Constant.GAME_VIEW_FXML);
   }
 

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import application.Constant;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -38,15 +39,22 @@ public class LoginController implements Initializable, Controller {
   public void loginButtonClick() {
     String account = loginUsername.getText();
     String psw = loginPassword.getText();
-    logger.log(Level.INFO, "输入用户名为：" + account);
-    logger.log(Level.INFO, "输入密码为：" + psw);
-    //TODO: connect with server
-    client.sendCmd(String.format("login:%s,%s", account, psw));
+    logger.log(Level.INFO, "USER NAME: " + account + "; PASSWORD: " + psw);
+    if (account.equals("") || psw.equals("")) {
+      Alert alert = new Alert(Alert.AlertType.WARNING);
+      alert.setTitle("Warning");
+      alert.setHeaderText(null);
+      alert.setContentText("EMPTY USERNAME OR PASSWORD!");
+      alert.showAndWait();
+    } else {
+      client.sendCmd(String.format("login:%s,%s", account, psw));
+    }
+
 //    if ("admin".equalsIgnoreCase(loginUsername.getText())
 //        && "123456".equalsIgnoreCase(loginPassword.getText())) {
 //    logger.log(Level.INFO, "登录成功！");
-    client.userName = loginUsername.getText();
-    client.enterView( Constant.HOME_VIEW_FXML);
+//    client.userName = loginUsername.getText();
+//    client.enterView( Constant.HOME_VIEW_FXML);
 //    } else {
 //
 //      logger.log(Level.WARNING, "用户名或密码错误！");
@@ -54,7 +62,9 @@ public class LoginController implements Initializable, Controller {
   }
 
   public void registerButtonClick() {
-    client.enterView(Constant.REGISTER_VIEW_FXML);
+    String account = loginUsername.getText();
+    String psw = loginPassword.getText();
+    client.sendCmd(String.format("reg:%s,%s",account, psw));
   }
 
   @Override

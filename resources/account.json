@@ -1,0 +1,11 @@
+{
+  "accounts": [
+    {
+      "user_name": "admin",
+      "password": "123456",
+      "gross_game": 0,
+      "win": 0,
+      "tie": 0
+    }
+  ]
+}

@@ -8,41 +8,31 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Client extends Application {
-
-    private FXMLLoader loader;
     private static final Logger logger = Logger.getLogger(Client.class.getName());
+    public final int[][] chessBoard = new int[3][3];
     public String userName;
     public int gross;
     public int win;
-    //first = 1, second = 2
+    public int tie;
     public int hand;
     public boolean isMyTurn = false;
-
-    public final int[][] chessBoard = new int[3][3];
-
+    private FXMLLoader loader;
     private Stage stage;
     private Socket socket;
-//    private Scanner in;
-//    private PrintWriter out;
-
-    public Client() {
-    }
+    private Date startTime = new Date();
 
     public static void main(String[] args) {
         launch(args);
@@ -55,26 +45,28 @@ public class Client extends Application {
         enterView(Constant.LOGIN_VIEW_FXML);
         stage.show();
         stage.setResizable(false);
+        stage.setOnCloseRequest(windowEvent -> {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         try {
-            socket = new Socket();
-            SocketAddress address = new InetSocketAddress("localhost", Constant.PORT);
-            socket.connect(address, 500);
-//            socket = new Socket("localhost", Constant.PORT);
-//            socket.setSoTimeout(300);
-//
-//            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-//            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-//            Scanner in = new Scanner(inputStream);
-//            out = new PrintWriter(outputStream);
+//            socket = new Socket();
+//            SocketAddress address = new InetSocketAddress("localhost", Constant.PORT);
+//            socket.connect(address, 500);
+            socket = new Socket("localhost", Constant.PORT);
+            socket.setSoTimeout(Constant.CLIENT_WAIT_TIME);
 
-            Thread thread = new Thread(this::connect);
+            Thread thread = new Thread(this::handle);
+            thread.setDaemon(true);
             thread.start();
-
         } catch (IOException e) {
             logger.log(Level.WARNING, e.toString());
+            stage.close();
         }
-
     }
 
     public void enterView(String viewPath) {
@@ -91,6 +83,7 @@ public class Client extends Application {
             PrintWriter out = new PrintWriter(socket.getOutputStream());
             out.println(cmd);
             out.flush();
+            startTime = new Date();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,22 +111,40 @@ public class Client extends Application {
         return loader.getController();
     }
 
-    public void connect() {
+    public void handle() {
         try {
             Scanner in = new Scanner(socket.getInputStream());
+            String receive;
             while (true) {
-                if (!in.hasNext()) {
+                if (new Date().getTime() - startTime.getTime() > Constant.CLIENT_WAIT_TIME) {
+                    System.out.println("time out");
+                    Platform.runLater(this::close);
                     return;
                 }
-                String receive = in.nextLine();
-                System.out.println("from server: "+receive);
+
+                try {
+                    receive = in.nextLine();
+                } catch (Exception e) {
+                    Thread.sleep(500);
+                    continue;
+                }
+
+                System.out.println("from server: " + receive);
 
                 if (receive.equals("waiting")) {
                     //todo: waiting window
+                } else if (receive.startsWith("login:")) {
+                    String[] backInfo = receive.substring(6).split(",");
+                    userName = backInfo[0];
+                    gross = Integer.parseInt(backInfo[1]);
+                    win = Integer.parseInt(backInfo[2]);
+                    tie = Integer.parseInt(backInfo[3]);
+                    logger.info(String.format("name:%s, gross:%d, win:%d, tie:%d", userName, gross, win, tie));
+                    Platform.runLater(() -> enterView(Constant.HOME_VIEW_FXML));
                 } else if (receive.startsWith("game start:")) {
                     hand = Integer.parseInt(receive.substring(11));
                     isMyTurn = hand == 1;
-                    enterView(Constant.GAME_VIEW_FXML);
+                    Platform.runLater(() -> enterView(Constant.GAME_VIEW_FXML));
                 } else if (receive.startsWith("oppo:")) {
                     String[] pos = receive.substring(5).split(",");
                     int x = Integer.parseInt(pos[0]);
@@ -142,14 +153,16 @@ public class Client extends Application {
                     isMyTurn = true;
                     GameController controller = loader.getController();
                     Platform.runLater(controller::drawChess);
-//                controller.drawChess();
-                } else if (receive.startsWith("result:")){
+                } else if (receive.startsWith("result:")) {
                     String res = receive.substring(7);
-                    System.out.println(res);
+//                    System.out.println(res);
+                    gross++;
                     if (res.equals("win")) {
                         //todo
-                    } else if (res.equals("lose")) {
+                        win++;
+                    } else if (res.equals("tie")) {
                         //todo
+                        tie++;
                     }
                     hand = 0;
                     for (int i = 0; i < chessBoard.length; i++) {
@@ -158,10 +171,18 @@ public class Client extends Application {
                         }
                     }
                     isMyTurn = false;
-
+                } else if (receive.startsWith("error:")) {
+                    String info = receive.substring(6);
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText(null);
+                        alert.setContentText(info);
+                        alert.showAndWait();
+                    });
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
