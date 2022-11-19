@@ -1,11 +1,18 @@
 {
   "accounts": [
     {
-      "user_name": "admin",
-      "password": "123456",
       "gross_game": 0,
-      "win": 0,
-      "tie": 0
+      "tie": 0,
+      "password": "123456",
+      "user_name": "admin",
+      "win": 0
+    },
+    {
+      "gross_game": 0,
+      "tie": 0,
+      "password": "666",
+      "user_name": "tester",
+      "win": 0
     }
   ]
 }

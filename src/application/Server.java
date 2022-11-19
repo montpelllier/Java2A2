@@ -13,7 +13,7 @@ public class Server {
             Thread thread = new Thread(service);
             thread.start();
 
-            System.out.println("Waiting for clients to handle...");
+            System.out.println("Waiting for clients to connect...");
             while (true) {
                 Socket clientSocket = server.accept();
                 System.out.printf("player %s connected.\n", clientSocket.getPort());

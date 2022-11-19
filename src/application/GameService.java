@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONArray;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.*;
 import java.util.logging.Logger;
@@ -15,7 +12,6 @@ import java.util.logging.Logger;
 public class GameService implements Runnable {
 
     private static final int EMPTY = 0;
-    private static final boolean TURN = false;
     private static int[][] chessBoard;
     Logger logger = Logger.getLogger(this.getClass().getName());
     List<Socket> playerList = new ArrayList<>();
@@ -102,7 +98,7 @@ public class GameService implements Runnable {
                     int x = Integer.parseInt(pos[0]);
                     int y = Integer.parseInt(pos[1]);
                     String backInfo = String.format("oppo:%d,%d", x, y);
-                    if (player == player1 || player == player2 && chessBoard[x][y] == EMPTY) {
+                    if ((player == player1 || player == player2) && chessBoard[x][y] == EMPTY) {
                         chessBoard[x][y] = player == player1 ? 1 : -1;
                         checkGameOver();
                         send(backInfo, player == player2 ? player1 : player2);
@@ -118,7 +114,6 @@ public class GameService implements Runnable {
                     }
                     String userName = logInfo[0];
                     String psw = logInfo[1];
-
                     boolean accountExist = false;
 
                     JSONObject jsonObject = JSON.parseObject(readJson(Constant.ACCOUNT_JSON));
@@ -160,14 +155,22 @@ public class GameService implements Runnable {
                         }
                     }
                     if (!accountExist) {
-                        //todo: 写文件
-//                        jsonArray.add();
+                        JSONObject account = new JSONObject();
+                        account.put("user_name", userName);
+                        account.put("password", psw);
+                        account.put("gross_game", 0);
+                        account.put("win", 0);
+                        account.put("tie", 0);
+                        //写入JSON文件
+                        jsonArray.add(account);
+                        jsonObject.put("accounts", jsonArray);
+                        writeJson(Constant.ACCOUNT_JSON, jsonObject);
+
                         send(String.format("login:%s,%d,%d,%d", userName, 0, 0, 0), player);
                     }
                 } else {
                     System.out.println("unknown command");
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -207,17 +210,14 @@ public class GameService implements Runnable {
         }
     }
 
-    private synchronized boolean checkResult(int num) {
+    private synchronized void checkResult(int num) {
         if (num == 3) {
             send("result:win", player1);
             send("result:lose", player2);
         } else if (num == -3) {
             send("result:lose", player1);
             send("result:win", player2);
-        } else {
-            return false;
         }
-        return true;
     }
 
     public synchronized void send(String msg, Socket socket) {
@@ -263,13 +263,23 @@ public class GameService implements Runnable {
             while((line = br.readLine()) != null){
                 sb.append(line);
             }
+            fr.close();
         }catch (Exception e) {
             e.printStackTrace();
         }
         return sb.toString();
      }
+     public synchronized void writeJson(String filePath, JSONObject jsonObject) {
+         try {
+             File file = new File(filePath);
+             FileWriter fw = new FileWriter(file);
+             System.out.println(jsonObject.toJSONString());
+             fw.write(jsonObject.toJSONString());
+             fw.flush();
 
-     public synchronized void writeJson() {
-
+             fw.close();
+         }catch (Exception e) {
+             e.printStackTrace();
+         }
      }
 }
