@@ -4,6 +4,7 @@ import application.controller.Controller;
 import application.controller.GameController;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.CookiePolicy;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Scanner;
@@ -16,6 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -154,11 +156,27 @@ public class Client extends Application {
         } else if (receive.startsWith("result:")) {
           String res = receive.substring(7);
           gross++;
-          if (res.equals("win")) {
-            //todo
-            win++;
+          if (res.equals("win") || res.equals("lose")) {
+            Platform.runLater(() -> {
+              Alert alert = new Alert(AlertType.INFORMATION);
+              alert.setTitle("GAME OVER");
+              alert.setHeaderText(null);
+              alert.setContentText("you "+res);
+              alert.showAndWait();
+              enterView(Constant.HOME_VIEW_FXML);
+            });
+            if (res.equals("win")) {
+              win++;
+            }
           } else if (res.equals("tie")) {
-            //todo
+            Platform.runLater(() -> {
+              Alert alert = new Alert(AlertType.INFORMATION);
+              alert.setTitle("GAME OVER");
+              alert.setHeaderText(null);
+              alert.setContentText("game "+res);
+              alert.showAndWait();
+              enterView(Constant.HOME_VIEW_FXML);
+            });
             tie++;
           }
           hand = 0;

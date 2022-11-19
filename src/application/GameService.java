@@ -25,8 +25,9 @@ public class GameService implements Runnable {
   Logger logger = Logger.getLogger(this.getClass().getName());
   List<Socket> playerList = new ArrayList<>();
   List<Thread> threadList = new ArrayList<>();
-
   Map<Socket, Date> startTime = new HashMap<>();
+
+  Map<Socket, String> nameMap = new HashMap<>();
   Socket player1;
   Socket player2;
   Socket waiting = null;
@@ -72,16 +73,37 @@ public class GameService implements Runnable {
       String cmd;
       while (true) {
         if (new Date().getTime() - startTime.get(player).getTime() > Constant.SERVER_WAIT_TIME) {
-          System.out.printf("player %d time out\n", player.getPort());
-          if (player == player1) {
-            send("result:win", player2);
+          logger.warning(String.format("player %d time out\n", player.getPort()));
 
-          } else if (player == player2) {
-            send("result:win", player1);
+          if (player == player1 || player == player2) {
+            String userName1 = nameMap.get(player);
+            String userName2 = nameMap.get(player == player2 ? player1 : player2);
+
+            JSONObject jsonObject = readJson(Constant.ACCOUNT_JSON);
+            JSONArray jsonArray = jsonObject.getJSONArray("accounts");
+            for (Object account : jsonArray) {
+              JSONObject accountJsonObject = (JSONObject) account;
+              String name = (String) (accountJsonObject.get("user_name"));
+              Integer gross = (Integer) accountJsonObject.get("gross_game");
+              Integer win = (Integer) accountJsonObject.get("win");
+
+              if (name.equals(userName1)) {
+                accountJsonObject.put("gross_game", gross + 1);
+              }
+              if (name.equals(userName2)) {
+                accountJsonObject.put("gross_game", gross + 1);
+                accountJsonObject.put("win", win + 1);
+              }
+            }
+            jsonObject.put("accounts", jsonArray);
+            writeJson(Constant.ACCOUNT_JSON, jsonObject);
+
+            send("result:win", player == player2 ? player1 : player2);
           }
+          playerList.remove(player);
+          nameMap.remove(player);
           return;
         }
-        //System.out.println("1234");
         try {
           cmd = in.nextLine();
         } catch (Exception e) {
@@ -89,8 +111,7 @@ public class GameService implements Runnable {
           continue;
         }
 
-        System.out.printf("from player %d: %s\n", player.getPort(), cmd);
-
+        logger.info(String.format("from player %d: %s\n", player.getPort(), cmd));
         if (cmd.equals("start")) {
           if (startNewGame(player)) {
             send("game start:-1", player);
@@ -115,7 +136,6 @@ public class GameService implements Runnable {
             send("illegal position", player);
           }
         } else if (cmd.startsWith("login:")) {
-          //todo
           String[] logInfo = cmd.substring(6).split(",");
           if (logInfo.length != 2) {
             logger.warning("error account info");
@@ -125,7 +145,7 @@ public class GameService implements Runnable {
           String psw = logInfo[1];
           boolean accountExist = false;
 
-          JSONObject jsonObject = JSON.parseObject(readJson(Constant.ACCOUNT_JSON));
+          JSONObject jsonObject = readJson(Constant.ACCOUNT_JSON);
           JSONArray jsonArray = jsonObject.getJSONArray("accounts");
           for (Object account : jsonArray) {
             String name = (String) ((JSONObject) account).get("user_name");
@@ -136,6 +156,7 @@ public class GameService implements Runnable {
               Integer tie = (Integer) ((JSONObject) account).get("tie");
               send(String.format("login:%s,%d,%d,%d", name, gross, win, tie), player);
               accountExist = true;
+              nameMap.put(player, userName);
               break;
             }
           }
@@ -153,7 +174,7 @@ public class GameService implements Runnable {
           String psw = regInfo[1];
           boolean accountExist = false;
 
-          JSONObject jsonObject = JSON.parseObject(readJson(Constant.ACCOUNT_JSON));
+          JSONObject jsonObject = readJson(Constant.ACCOUNT_JSON);
           JSONArray jsonArray = jsonObject.getJSONArray("accounts");
           for (Object account : jsonArray) {
             String name = (String) ((JSONObject) account).get("user_name");
@@ -175,6 +196,7 @@ public class GameService implements Runnable {
             jsonObject.put("accounts", jsonArray);
             writeJson(Constant.ACCOUNT_JSON, jsonObject);
 
+            nameMap.put(player, userName);
             send(String.format("login:%s,%d,%d,%d", userName, 0, 0, 0), player);
           }
         } else {
@@ -188,45 +210,106 @@ public class GameService implements Runnable {
   }
 
   private synchronized void checkGameOver() {
-    boolean tie = true;
+    boolean isTie = true;
     for (int i = 0; i < 3; i++) {
       //检查行
       int sum = Arrays.stream(chessBoard[i]).sum();
-      checkResult(sum);
+      if (checkResult(sum)) {
+        return;
+      }
       //检查列
       sum = 0;
       for (int j = 0; j < 3; j++) {
         sum += chessBoard[j][i];
         if (chessBoard[i][j] == EMPTY) {
-          tie = false;
+          isTie = false;
         }
       }
-      checkResult(sum);
+      if (checkResult(sum)) {
+        return;
+      }
     }
     //检查对角
     for (int i = 0, sum = 0; i < 3; i++) {
       sum += chessBoard[i][i];
-      checkResult(sum);
+      if (checkResult(sum)) {
+        return;
+      }
     }
     for (int i = 0, sum = 0; i < 3; i++) {
       sum += chessBoard[2 - i][i];
-      checkResult(sum);
+      if (checkResult(sum)) {
+        return;
+      }
     }
     //检查平局
-    if (tie) {
+    if (isTie) {
+      String userName1 = nameMap.get(player1);
+      String userName2 = nameMap.get(player2);
+
+      JSONObject jsonObject = readJson(Constant.ACCOUNT_JSON);
+      JSONArray jsonArray = jsonObject.getJSONArray("accounts");
+      for (Object account : jsonArray) {
+        JSONObject accountJsonObject = (JSONObject) account;
+        String name = (String) (accountJsonObject.get("user_name"));
+        Integer gross = (Integer) accountJsonObject.get("gross_game");
+        Integer tie = (Integer) accountJsonObject.get("tie");
+
+        if (name.equals(userName1)) {
+          accountJsonObject.put("gross_game", gross + 1);
+          accountJsonObject.put("tie", tie + 1);
+        }
+        if (name.equals(userName2)) {
+          accountJsonObject.put("gross_game", gross + 1);
+          accountJsonObject.put("tie", tie + 1);
+        }
+      }
+      jsonObject.put("accounts", jsonArray);
+      writeJson(Constant.ACCOUNT_JSON, jsonObject);
+
       send("result:tie", player1);
       send("result:tie", player2);
     }
   }
 
-  private synchronized void checkResult(int num) {
+  private synchronized boolean checkResult(int num) {
+    Socket winner = null, loser = null;
     if (num == 3) {
-      send("result:win", player1);
-      send("result:lose", player2);
+      winner = player1;
+      loser = player2;
     } else if (num == -3) {
-      send("result:lose", player1);
-      send("result:win", player2);
+      winner = player2;
+      loser = player1;
     }
+
+    if (winner != null) {
+      String userName1 = nameMap.get(winner);
+      String userName2 = nameMap.get(loser);
+
+      JSONObject jsonObject = readJson(Constant.ACCOUNT_JSON);
+      JSONArray jsonArray = jsonObject.getJSONArray("accounts");
+      for (Object account : jsonArray) {
+        JSONObject accountJsonObject = (JSONObject) account;
+        String name = (String) (accountJsonObject.get("user_name"));
+        Integer gross = (Integer) accountJsonObject.get("gross_game");
+        Integer win = (Integer) accountJsonObject.get("win");
+
+        if (name.equals(userName1)) {
+          accountJsonObject.put("gross_game", gross + 1);
+          accountJsonObject.put("win", win + 1);
+        }
+        if (name.equals(userName2)) {
+          accountJsonObject.put("gross_game", gross + 1);
+        }
+      }
+      jsonObject.put("accounts", jsonArray);
+      writeJson(Constant.ACCOUNT_JSON, jsonObject);
+
+      send("result:win", winner);
+      send("result:lose", loser);
+      return true;
+    }
+    return false;
   }
 
   public synchronized void send(String msg, Socket socket) {
@@ -262,7 +345,7 @@ public class GameService implements Runnable {
     return false;
   }
 
-  public synchronized String readJson(String filePath) {
+  public synchronized JSONObject readJson(String filePath) {
     StringBuffer sb = new StringBuffer();
     try {
       File file = new File(filePath);
@@ -276,7 +359,7 @@ public class GameService implements Runnable {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return sb.toString();
+    return JSON.parseObject(sb.toString());
   }
 
   public synchronized void writeJson(String filePath, JSONObject jsonObject) {
