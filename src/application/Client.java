@@ -4,7 +4,6 @@ import application.controller.Controller;
 import application.controller.GameController;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.CookiePolicy;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Scanner;
@@ -130,7 +129,7 @@ public class Client extends Application {
         System.out.println("from server: " + receive);
 
         if (receive.equals("waiting")) {
-          //todo: waiting window
+
         } else if (receive.startsWith("login:")) {
           String[] backInfo = receive.substring(6).split(",");
           userName = backInfo[0];
@@ -161,7 +160,7 @@ public class Client extends Application {
               Alert alert = new Alert(AlertType.INFORMATION);
               alert.setTitle("GAME OVER");
               alert.setHeaderText(null);
-              alert.setContentText("you "+res);
+              alert.setContentText("you " + res);
               alert.showAndWait();
               enterView(Constant.HOME_VIEW_FXML);
             });
@@ -173,7 +172,7 @@ public class Client extends Application {
               Alert alert = new Alert(AlertType.INFORMATION);
               alert.setTitle("GAME OVER");
               alert.setHeaderText(null);
-              alert.setContentText("game "+res);
+              alert.setContentText("game " + res);
               alert.showAndWait();
               enterView(Constant.HOME_VIEW_FXML);
             });

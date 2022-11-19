@@ -273,7 +273,8 @@ public class GameService implements Runnable {
   }
 
   private synchronized boolean checkResult(int num) {
-    Socket winner = null, loser = null;
+    Socket winner = null;
+    Socket loser = null;
     if (num == 3) {
       winner = player1;
       loser = player2;
